@@ -36,15 +36,27 @@ export default function Chat() {
     setIsLoading(true);
 
     try {
-      // TODO: Integrate with your AI backend or Gemini API
-      // Mock response for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+      
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response from chatbot");
+      }
+
+      const data = await response.json();
       
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "I'm a demo assistant. Connect me to your AI backend to provide real medical insights!",
+          content: data.response,
         },
       ]);
     } catch (error) {

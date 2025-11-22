@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from ultralytics import YOLO
 import shutil
 import uuid
@@ -203,6 +204,50 @@ from fastapi.staticfiles import StaticFiles
 app.mount("/processed", StaticFiles(directory="processed"), name="processed")
 app.mount("/runs/detect/predict", StaticFiles(directory="runs/detect/predict"), name="yolo_output")
 
+
+
+# -------------------------------
+# CHATBOT ENDPOINT
+# -------------------------------
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    """
+    Chatbot endpoint for general skin health queries.
+    Uses Gemini to provide medical advice and answer questions.
+    """
+    try:
+        chat_model = genai.GenerativeModel("models/gemini-2.5-flash")
+        
+        system_prompt = """
+        You are a helpful medical assistant specializing in dermatology and skin health.
+        Provide clear, accurate, and compassionate advice about skin conditions, treatments, and skincare.
+        
+        Important guidelines:
+        - For serious conditions or suspected cancers, always recommend consulting a dermatologist
+        - Keep answers concise and easy to understand
+        - Avoid overly technical medical jargon
+        - If uncertain, acknowledge limitations and suggest professional consultation
+        - Never provide definitive diagnoses without proper examination
+        """
+        
+        full_prompt = f"{system_prompt}\n\nUser Question: {request.message}"
+        
+        response = chat_model.generate_content(full_prompt)
+        
+        return {
+            "response": response.text.strip(),
+            "model_used": "Gemini 2.5 Flash"
+        }
+        
+    except Exception as e:
+        print("Chat Error:", e)
+        return {
+            "response": "I'm sorry, I encountered an error processing your question. Please try again or consult a healthcare professional.",
+            "model_used": "Error"
+        }
 
 
 # -------------------------------
