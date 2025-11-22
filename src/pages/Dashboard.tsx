@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, Upload, History, Activity } from 'lucide-react';
+import { LogOut, Upload, History, Activity, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageUpload from '@/components/ImageUpload';
 import ResultsDisplay from '@/components/ResultsDisplay';
@@ -93,6 +93,11 @@ const Dashboard = () => {
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
+
+            <Button variant="outline" size="sm" onClick={() => navigate('/chat')}>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Chat
+            </Button>
 
             <Button variant="outline" size="sm" onClick={() => setShowHistory(!showHistory)}>
               <History className="h-4 w-4 mr-2" />
