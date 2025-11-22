@@ -1,5 +1,5 @@
 {
     "condition": "Chickenpox",
-    "prescription": "Chickenpox is a viral illness that typically resolves on its own. Treatment focuses on relieving symptoms. Apply over-the-counter calamine lotion to the spots to soothe itching. For fever or pain, you can use acetaminophen (paracetamol). **Crucially, do not give aspirin to children with chickenpox.** Consult a doctor for appropriate dosing and if symptoms worsen.",
-    "tips": "Give lukewarm baths with colloidal oatmeal or baking soda to help calm itchy skin; pat dry gently afterwards. Keep your child's fingernails trimmed short and encourage them not to scratch the blisters to prevent scarring and secondary bacterial infections. Ensure they drink plenty of fluids and get adequate rest."
+    "prescription": "Soothe the itchy spots with calamine lotion or by taking a cool oatmeal bath. Use children's acetaminophen (e.g., Tylenol) for fever or discomfort, but strictly avoid aspirin. It's recommended to see a doctor to confirm the diagnosis and manage symptoms.",
+    "tips": "Keep the child's fingernails short to prevent scratching, which can cause scarring and infection. Encourage plenty of fluids to stay hydrated. Chickenpox is very contagious, so keep the child home from school or daycare until all spots have crusted over."
 }
