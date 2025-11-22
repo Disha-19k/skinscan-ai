@@ -8,26 +8,31 @@ import { toast } from 'sonner';
 import ImageUpload from '@/components/ImageUpload';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import ScanHistory from '@/components/ScanHistory';
-import { predictSkinCondition, getGeminiInsights, PredictionResult } from '@/services/api';
+import { predictSkinCondition, PredictionResult } from '@/services/api';
 
+// 🔥 UPDATED ScanRecord Interface
 export interface ScanRecord extends PredictionResult {
   id: string;
   timestamp: number;
   imageDataUrl: string;
-  insights?: string;
+  prescription?: string;  // ← Added
+  tips?: string;          // ← Added
 }
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentResult, setCurrentResult] = useState<ScanRecord | null>(null);
+
   const [scanHistory, setScanHistory] = useState<ScanRecord[]>(() => {
     const stored = localStorage.getItem('scanHistory');
     return stored ? JSON.parse(stored) : [];
   });
+
   const [showHistory, setShowHistory] = useState(false);
 
   const handleLogout = () => {
@@ -48,22 +53,27 @@ const Dashboard = () => {
     }
 
     setIsAnalyzing(true);
-    try {
-      const prediction = await predictSkinCondition(selectedFile);
-      const insights = await getGeminiInsights(prediction.prediction);
 
+    try {
+      // 🔥 Call ONLY the main backend /predict API
+      const prediction = await predictSkinCondition(selectedFile);
+
+      // 🔥 Construct scan record from backend response
       const scanRecord: ScanRecord = {
         ...prediction,
         id: Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         imageDataUrl: imagePreview!,
-        insights: insights.text,
+        prescription: prediction.prescription,
+        tips: prediction.tips,
       };
 
       setCurrentResult(scanRecord);
+
       const updatedHistory = [scanRecord, ...scanHistory];
       setScanHistory(updatedHistory);
       localStorage.setItem('scanHistory', JSON.stringify(updatedHistory));
+
       toast.success('Analysis complete!');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Analysis failed');
@@ -80,12 +90,15 @@ const Dashboard = () => {
             <Activity className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">Skin Health AI</h1>
           </div>
+
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
+
             <Button variant="outline" size="sm" onClick={() => setShowHistory(!showHistory)}>
               <History className="h-4 w-4 mr-2" />
               History
             </Button>
+
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -122,8 +135,10 @@ const Dashboard = () => {
                   Upload a clear image of the affected skin area for AI-powered analysis
                 </CardDescription>
               </CardHeader>
+
               <CardContent className="space-y-4">
                 <ImageUpload onFileSelect={handleFileSelect} preview={imagePreview} />
+
                 <Button
                   onClick={handleAnalyze}
                   disabled={!selectedFile || isAnalyzing}
